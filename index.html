@@ -152,6 +152,92 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/30/%E8%AF%A6%E8%A7%A3apply%E3%80%81bind%E5%92%8Ccall/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Soda">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Soda的小破站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/30/%E8%AF%A6%E8%A7%A3apply%E3%80%81bind%E5%92%8Ccall/" class="post-title-link" itemprop="url">详解apply、bind和call</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-08-30 18:47:16 / 修改时间：19:39:11" itemprop="dateCreated datePublished" datetime="2022-08-30T18:47:16+08:00">2022-08-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="apply、call和bind的作用"><a href="#apply、call和bind的作用" class="headerlink" title="apply、call和bind的作用"></a>apply、call和bind的作用</h1><p>​    我们都知道，在JavaScript中，this指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的this指向会根据调用的环境和对象来确定this指向，有关于this指针的指向，稍后我会在另一篇博客另作详解。</p>
+<p>​    而apply、call和bind就是可以<strong>显式的改变函数的this指向</strong>。</p>
+<h1 id="apply、call和bind的用法"><a href="#apply、call和bind的用法" class="headerlink" title="apply、call和bind的用法"></a>apply、call和bind的用法</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&quot;Soda&quot;</span>,</span><br><span class="line">    <span class="attr">showName</span>:<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&quot;Cola&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj1.showName(); <span class="comment">// Soda</span></span><br><span class="line">obj1.showName.call(obj2); <span class="comment">// Cola</span></span><br><span class="line">obj1.showName.apply(obj2); <span class="comment">// Cola</span></span><br><span class="line">obj1.showName.bind(obj2)(); <span class="comment">// Cola</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>​        可以看出，我们通过apply、bind和call可以显式的改变了函数的this指向，这里我们先说call和apply的区别，看下面的例子</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&quot;Soda&quot;</span>,</span><br><span class="line">    <span class="attr">showName</span>:<span class="function"><span class="keyword">function</span>(<span class="params">move1,move2</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.name + move1 + move2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&quot;Cola&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj1.showName.call(obj2,<span class="string">&quot;唱歌&quot;</span>,<span class="string">&quot;跳舞&quot;</span>); <span class="comment">// Cola唱歌跳舞</span></span><br><span class="line">obj1.showName.apply(obj2,[<span class="string">&quot;唱歌&quot;</span>,<span class="string">&quot;跳舞&quot;</span>]); <span class="comment">// Cola唱歌跳舞</span></span><br></pre></td></tr></table></figure>
+
+<p>​    可以看出，通过apply绑定的函数传递的参数是数组类型的，而通过call绑定的函数传递的参数则是一个一个传入的。</p>
+<p>​    在第一个例子我们可以看出，我们通过bind绑定的函数必须要再调用一次才会起作用，这是因为我们通过bind修改this的函数时，原来的函数不会立马调用，而是返回一个新的函数，我们需要通过去调用这个返回新的函数，才能得到最终的结果。而且bind修改this指向时，也可以传递参数，传递参数的方法和apply相同，也是传入一个数组。</p>
+<h1 id="手写apply、bind和call"><a href="#手写apply、bind和call" class="headerlink" title="手写apply、bind和call"></a>手写apply、bind和call</h1><h1 id="call"><a href="#call" class="headerlink" title="call"></a>call</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myCall = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,...args</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//3.调用被执行的函数</span></span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...args);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//4.返回执行函数的结果</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="apply"><a href="#apply" class="headerlink" title="apply"></a>apply</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myApply = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,argsArr</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//3.调用被执行的函数</span></span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    argsArr = argsArr || [];<span class="comment">//判断是否有值，防止为空时在下面对undefined使用...报错</span></span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...argsArr);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//4.返回执行函数的结果</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myBind = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,argsArr</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//3.创建代理函数</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">ProxyFn</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    <span class="keyword">var</span> finalArgs = [...argsArr,...args];</span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...finalArgs);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line">      </span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//4.返回代理函数</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/29/%E5%87%BD%E6%95%B0%E6%A8%A1%E5%9D%97%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -665,7 +751,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -676,7 +762,7 @@
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
