@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="1.柯里化的概念​    在维基百科中，函数柯里化是这样定义的： ​    在计算机科学中，柯里化（英語：Currying），又译为卡瑞化或加里化，是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。 ​    柯里化声称，如果你固定某些参数，你将得到接受余下参数的一个函数。 ​    上面的解释是非常抽象的，我们用大白话来">
+  <meta name="description" content="柯里化的概念​    在维基百科中，函数柯里化是这样定义的： ​    在计算机科学中，柯里化（英語：Currying），又译为卡瑞化或加里化，是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。 ​    柯里化声称，如果你固定某些参数，你将得到接受余下参数的一个函数。 ​    上面的解释是非常抽象的，我们用大白话来解释">
 <meta property="og:type" content="article">
 <meta property="og:title" content="函数柯里化">
 <meta property="og:url" content="http://example.com/2022/08/28/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/index.html">
 <meta property="og:site_name" content="Soda的小破站">
-<meta property="og:description" content="1.柯里化的概念​    在维基百科中，函数柯里化是这样定义的： ​    在计算机科学中，柯里化（英語：Currying），又译为卡瑞化或加里化，是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。 ​    柯里化声称，如果你固定某些参数，你将得到接受余下参数的一个函数。 ​    上面的解释是非常抽象的，我们用大白话来">
+<meta property="og:description" content="柯里化的概念​    在维基百科中，函数柯里化是这样定义的： ​    在计算机科学中，柯里化（英語：Currying），又译为卡瑞化或加里化，是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。 ​    柯里化声称，如果你固定某些参数，你将得到接受余下参数的一个函数。 ​    上面的解释是非常抽象的，我们用大白话来解释">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-08-28T15:05:37.204Z">
-<meta property="article:modified_time" content="2022-08-28T16:03:10.928Z">
+<meta property="article:modified_time" content="2022-08-30T04:02:31.829Z">
 <meta property="article:author" content="Soda">
 <meta property="article:tag" content="柯里化">
 <meta name="twitter:card" content="summary">
@@ -188,7 +188,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-08-29 00:03:10" itemprop="dateModified" datetime="2022-08-29T00:03:10+08:00">2022-08-29</time>
+                <time title="修改时间：2022-08-30 12:02:31" itemprop="dateModified" datetime="2022-08-30T12:02:31+08:00">2022-08-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -211,7 +211,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="1-柯里化的概念"><a href="#1-柯里化的概念" class="headerlink" title="1.柯里化的概念"></a>1.柯里化的概念</h1><p>​    在维基百科中，函数柯里化是这样定义的：</p>
+        <h1 id="柯里化的概念"><a href="#柯里化的概念" class="headerlink" title="柯里化的概念"></a>柯里化的概念</h1><p>​    在维基百科中，函数柯里化是这样定义的：</p>
 <p>​    在计算机科学中，<strong>柯里化</strong>（英語：Currying），又译为<strong>卡瑞化</strong>或<strong>加里化</strong>，是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。</p>
 <p>​    柯里化声称，如果你固定某些参数，你将得到接受余下参数的一个函数。</p>
 <p>​    上面的解释是非常抽象的，我们用大白话来解释一下，所谓的柯里化，就是只传递函数一部分参数给一个函数，然后返回这个函数，利用这个返回的函数去处理原函数的剩余参数。</p>
@@ -223,8 +223,8 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeAdd</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">a,b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b + num;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> add5 = makeAdd(<span class="number">5</span>)</span><br><span class="line">add5(<span class="number">3</span>,<span class="number">4</span>);</span><br><span class="line">add5(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">add5(<span class="number">7</span>,<span class="number">8</span>);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 
 <p>​    现在在看起来，我们的代码是不是看起来舒服很多，这个过程就叫做函数的柯里化。</p>
-<h1 id="2-柯里化的优点"><a href="#2-柯里化的优点" class="headerlink" title="2.柯里化的优点"></a>2.柯里化的优点</h1><h2 id="2-1-使逻辑复用"><a href="#2-1-使逻辑复用" class="headerlink" title="2.1 使逻辑复用"></a>2.1 使逻辑复用</h2><p>​    通过上述代码块中的<strong>makeAdd函数</strong>我们可以看出，如果我们某两个数相加再加上另外一个不变的数字，我们就可以调用这个函数传入相应的数值就可以完成。</p>
-<h2 id="2-2-让函数职责变得单一"><a href="#2-2-让函数职责变得单一" class="headerlink" title="2.2 让函数职责变得单一"></a>2.2 让函数职责变得单一</h2><p>​    我们举个例子，假如我们有一个函数有下面的需求：</p>
+<h1 id="柯里化的优点"><a href="#柯里化的优点" class="headerlink" title="柯里化的优点"></a>柯里化的优点</h1><h2 id="使逻辑复用"><a href="#使逻辑复用" class="headerlink" title="使逻辑复用"></a>使逻辑复用</h2><p>​    通过上述代码块中的<strong>makeAdd函数</strong>我们可以看出，如果我们某两个数相加再加上另外一个不变的数字，我们就可以调用这个函数传入相应的数值就可以完成。</p>
+<h2 id="让函数职责变得单一"><a href="#让函数职责变得单一" class="headerlink" title="让函数职责变得单一"></a>让函数职责变得单一</h2><p>​    我们举个例子，假如我们有一个函数有下面的需求：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//第一个参数 + 2</span></span><br><span class="line"><span class="comment">//第二个参数 * 2</span></span><br><span class="line"><span class="comment">//第三个参数平方</span></span><br><span class="line"><span class="comment">//返回处理后参数的和</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params">x, y, z</span>) </span>&#123;</span><br><span class="line">  x = x + <span class="number">2</span></span><br><span class="line">  y = y * <span class="number">2</span></span><br><span class="line">  z = z * z</span><br><span class="line">  <span class="keyword">return</span> x + y + z</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">add(<span class="number">10</span>,<span class="number">20</span>,<span class="number">30</span>)</span><br></pre></td></tr></table></figure>
 
 <p>​    为了处理上述需求，我们编写这样一个函数是没有任何问题的，但是如果我们想让这个需求细化到每个步骤呢？也就是说将一个函数拆分成多个函数，第一个函数去实现第一个步骤，第二个函数去实现第二个步骤，第三个函数处理第三、四个步骤（其实也可以写成四个函数），那么我们就得到了以下的形式。</p>
@@ -232,7 +232,7 @@
 
 
 
-<h1 id="3-自动柯里化函数的实现"><a href="#3-自动柯里化函数的实现" class="headerlink" title="3.自动柯里化函数的实现"></a>3.自动柯里化函数的实现</h1><p>​    抛开好处不说，我们可以明显感觉到，柯里化函数相对于一般的函数嵌套了更多层级，编写难度更加的大。所以难道在开发中，我们想实现柯里化函数的时候需要自己手写吗？答案肯定是否定的，这里我们可以手写一个自动化柯里化函数，封装成一个工具函数供我们使用。</p>
+<h1 id="自动柯里化函数的实现"><a href="#自动柯里化函数的实现" class="headerlink" title="自动柯里化函数的实现"></a>自动柯里化函数的实现</h1><p>​    抛开好处不说，我们可以明显感觉到，柯里化函数相对于一般的函数嵌套了更多层级，编写难度更加的大。所以难道在开发中，我们想实现柯里化函数的时候需要自己手写吗？答案肯定是否定的，这里我们可以手写一个自动化柯里化函数，封装成一个工具函数供我们使用。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myCurrying</span>(<span class="params">fn</span>) </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">curried</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//这里判断接收参数的个数，如果接受参数的个数大于等于原来函数需要的参数时，我们就执行原函数</span></span><br><span class="line">		<span class="keyword">if</span> (args.length &gt;= fn.length) &#123;</span><br><span class="line">			fn.apply(<span class="built_in">this</span>, args);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="function"><span class="keyword">function</span> <span class="title">curried2</span>(<span class="params">...args2</span>) </span>&#123;</span><br><span class="line">        <span class="comment">//如果没有达到上述要求时，我们就要递归curried这个函数检查参数是否达到</span></span><br><span class="line">				<span class="keyword">return</span> curried.apply(<span class="built_in">this</span>, args.concat(args2));</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> curried2;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> curried;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
@@ -318,7 +318,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E6%9F%AF%E9%87%8C%E5%8C%96%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">1.柯里化的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E6%9F%AF%E9%87%8C%E5%8C%96%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">2.柯里化的优点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E4%BD%BF%E9%80%BB%E8%BE%91%E5%A4%8D%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 使逻辑复用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E8%AE%A9%E5%87%BD%E6%95%B0%E8%81%8C%E8%B4%A3%E5%8F%98%E5%BE%97%E5%8D%95%E4%B8%80"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 让函数职责变得单一</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E8%87%AA%E5%8A%A8%E6%9F%AF%E9%87%8C%E5%8C%96%E5%87%BD%E6%95%B0%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">3.自动柯里化函数的实现</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9F%AF%E9%87%8C%E5%8C%96%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">柯里化的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9F%AF%E9%87%8C%E5%8C%96%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">柯里化的优点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E9%80%BB%E8%BE%91%E5%A4%8D%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">使逻辑复用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A9%E5%87%BD%E6%95%B0%E8%81%8C%E8%B4%A3%E5%8F%98%E5%BE%97%E5%8D%95%E4%B8%80"><span class="nav-number">2.2.</span> <span class="nav-text">让函数职责变得单一</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E6%9F%AF%E9%87%8C%E5%8C%96%E5%87%BD%E6%95%B0%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">自动柯里化函数的实现</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
