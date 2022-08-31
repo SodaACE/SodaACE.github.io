@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="apply、call 和 bind 的作用​ 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。 ​ 而 apply、call 和 bind 就是可以显式的改变函数的 this 指向。 apply、call 和 bi">
+  <meta name="description" content="apply、call 和 bind 的作用 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。  而 apply、call 和 bind 就是可以显式的改变函数的 this 指向。 apply、call 和 bind">
 <meta property="og:type" content="article">
 <meta property="og:title" content="详解apply、bind和call">
 <meta property="og:url" content="http://example.com/2022/08/30/%E8%AF%A6%E8%A7%A3apply%E3%80%81bind%E5%92%8Ccall/index.html">
 <meta property="og:site_name" content="Soda的小破站">
-<meta property="og:description" content="apply、call 和 bind 的作用​ 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。 ​ 而 apply、call 和 bind 就是可以显式的改变函数的 this 指向。 apply、call 和 bi">
+<meta property="og:description" content="apply、call 和 bind 的作用 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。  而 apply、call 和 bind 就是可以显式的改变函数的 this 指向。 apply、call 和 bind">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-08-30T10:47:16.638Z">
-<meta property="article:modified_time" content="2022-08-30T11:48:20.408Z">
+<meta property="article:modified_time" content="2022-08-31T12:30:34.278Z">
 <meta property="article:author" content="Soda">
 <meta property="article:tag" content="手写源码系列">
 <meta name="twitter:card" content="summary">
@@ -180,10 +180,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-08-30 18:47:16 / 修改时间：19:48:20" itemprop="dateCreated datePublished" datetime="2022-08-30T18:47:16+08:00">2022-08-30</time>
+              <time title="创建时间：2022-08-30 18:47:16" itemprop="dateCreated datePublished" datetime="2022-08-30T18:47:16+08:00">2022-08-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-31 20:30:34" itemprop="dateModified" datetime="2022-08-31T20:30:34+08:00">2022-08-31</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -205,15 +211,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="apply、call-和-bind-的作用"><a href="#apply、call-和-bind-的作用" class="headerlink" title="apply、call 和 bind 的作用"></a>apply、call 和 bind 的作用</h1><p>​ 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。</p>
-<p>​ 而 apply、call 和 bind 就是可以<strong>显式的改变函数的 this 指向</strong>。</p>
+        <h1 id="apply、call-和-bind-的作用"><a href="#apply、call-和-bind-的作用" class="headerlink" title="apply、call 和 bind 的作用"></a>apply、call 和 bind 的作用</h1><p> 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。</p>
+<p> 而 apply、call 和 bind 就是可以<strong>显式的改变函数的 this 指向</strong>。</p>
 <h1 id="apply、call-和-bind-的用法"><a href="#apply、call-和-bind-的用法" class="headerlink" title="apply、call 和 bind 的用法"></a>apply、call 和 bind 的用法</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Soda&quot;</span>,</span><br><span class="line">	<span class="attr">showName</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Cola&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">obj1.showName(); <span class="comment">// Soda</span></span><br><span class="line">obj1.showName.call(obj2); <span class="comment">// Cola</span></span><br><span class="line">obj1.showName.apply(obj2); <span class="comment">// Cola</span></span><br><span class="line">obj1.showName.bind(obj2)(); <span class="comment">// Cola</span></span><br></pre></td></tr></table></figure>
 
-<p>​ 可以看出，我们通过 apply、bind 和 call 可以显式的改变了函数的 this 指向，这里我们先说 call 和 apply 的区别，看下面的例子</p>
+<p> 可以看出，我们通过 apply、bind 和 call 可以显式的改变了函数的 this 指向，这里我们先说 call 和 apply 的区别，看下面的例子</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Soda&quot;</span>,</span><br><span class="line">	<span class="attr">showName</span>: <span class="function"><span class="keyword">function</span> (<span class="params">move1, move2</span>) </span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="built_in">this</span>.name + move1 + move2);</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Cola&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">obj1.showName.call(obj2, <span class="string">&quot;唱歌&quot;</span>, <span class="string">&quot;跳舞&quot;</span>); <span class="comment">// Cola唱歌跳舞</span></span><br><span class="line">obj1.showName.apply(obj2, [<span class="string">&quot;唱歌&quot;</span>, <span class="string">&quot;跳舞&quot;</span>]); <span class="comment">// Cola唱歌跳舞</span></span><br></pre></td></tr></table></figure>
 
-<p>​ 可以看出，通过 apply 绑定的函数传递的参数是数组类型的，而通过 call 绑定的函数传递的参数则是一个一个传入的。</p>
-<p>​ 在第一个例子我们可以看出，我们通过 bind 绑定的函数必须要再调用一次才会起作用，这是因为我们通过 bind 修改 this 的函数时，原来的函数不会立马调用，而是返回一个新的函数，我们需要通过去调用这个返回新的函数，才能得到最终的结果。而且 bind 修改 this 指向时，也可以传递参数，传递参数的方法和 apply 相同，也是传入一个数组。</p>
+<p> 可以看出，通过 apply 绑定的函数传递的参数是数组类型的，而通过 call 绑定的函数传递的参数则是一个一个传入的。</p>
+<p> 在第一个例子我们可以看出，我们通过 bind 绑定的函数必须要再调用一次才会起作用，这是因为我们通过 bind 修改 this 的函数时，原来的函数不会立马调用，而是返回一个新的函数，我们需要通过去调用这个返回新的函数，才能得到最终的结果。而且 bind 修改 this 指向时，也可以传递参数，传递参数的方法和 apply 相同，也是传入一个数组。</p>
 <h1 id="手写-apply、bind-和-call"><a href="#手写-apply、bind-和-call" class="headerlink" title="手写 apply、bind 和 call"></a>手写 apply、bind 和 call</h1><h1 id="call"><a href="#call" class="headerlink" title="call"></a>call</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myCall = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,...args</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.调用被执行的函数</span></span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...args);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//4.返回执行函数的结果</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="apply"><a href="#apply" class="headerlink" title="apply"></a>apply</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myApply = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,argsArr</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.调用被执行的函数</span></span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    argsArr = argsArr || [];<span class="comment">//判断是否有值，防止为空时在下面对undefined使用...报错</span></span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...argsArr);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//4.返回执行函数的结果</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -240,7 +246,10 @@
     <a href="/2022/08/29/%E5%87%BD%E6%95%B0%E6%A8%A1%E5%9D%97%E5%8C%96/" rel="prev" title="函数模块化">
       <i class="fa fa-chevron-left"></i> 函数模块化
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/08/31/%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0/" rel="next" title="组合函数">
+      组合函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -315,7 +324,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -326,7 +335,7 @@
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>

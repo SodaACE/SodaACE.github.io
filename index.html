@@ -152,6 +152,79 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/31/%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Soda">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Soda的小破站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/31/%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">组合函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-08-31 20:24:25 / 修改时间：21:06:49" itemprop="dateCreated datePublished" datetime="2022-08-31T20:24:25+08:00">2022-08-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="组合函数的概念"><a href="#组合函数的概念" class="headerlink" title="组合函数的概念"></a>组合函数的概念</h1><p>​ 组合函数是 JavaScript 开发过程中的一种<strong>对函数的使用技巧模式</strong>。</p>
+<p>​ 比如我们相处理某个数据需要进行函数的调用，但是我们需要依次调用两个函数才能达到最终效果。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">double</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> num * <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">square</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> num ** <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">compose</span>(<span class="params">fn1, fn2</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">x</span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> fn2(fn(<span class="number">1</span>));</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> calFn = compose(double, square);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(calFn(<span class="number">3</span>)); <span class="comment">//36</span></span><br></pre></td></tr></table></figure>
+
+<p>​ 在上面这个例子中，我们需要对某个数据进行乘 2 并平方的操作，如果我们不用组合函数，则处理每个数据时都需要调用两次函数，这样操作会显得<strong>十分重复</strong>；而如果我们用了组合函数后，只需要调用一次即可。这种对<strong>函数的组合</strong>，我们就称作<strong>组合函数</strong>。</p>
+<h1 id="组合函数的实现"><a href="#组合函数的实现" class="headerlink" title="组合函数的实现"></a>组合函数的实现</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">compose</span>(<span class="params">...fns</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//对传进来的函数进行检测</span></span><br><span class="line">	<span class="keyword">const</span> length = fns.length;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">typeof</span> fns[i] !== <span class="string">&quot;function&quot;</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">&quot;Expected a function&quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//执行所有的函数</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">..args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> index = <span class="number">0</span></span><br><span class="line">    <span class="comment">//先获取第一次执行函数的结果</span></span><br><span class="line">    <span class="keyword">let</span> result = length ? fns[index].apply(<span class="built_in">this</span>,args) : args</span><br><span class="line">    <span class="keyword">while</span>(++index &lt; length) &#123;</span><br><span class="line">      result = fns[index].call(<span class="built_in">this</span>,args)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/30/%E8%AF%A6%E8%A7%A3apply%E3%80%81bind%E5%92%8Ccall/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -175,10 +248,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-08-30 18:47:16 / 修改时间：19:48:20" itemprop="dateCreated datePublished" datetime="2022-08-30T18:47:16+08:00">2022-08-30</time>
+              <time title="创建时间：2022-08-30 18:47:16" itemprop="dateCreated datePublished" datetime="2022-08-30T18:47:16+08:00">2022-08-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-31 20:30:34" itemprop="dateModified" datetime="2022-08-31T20:30:34+08:00">2022-08-31</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -200,15 +279,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="apply、call-和-bind-的作用"><a href="#apply、call-和-bind-的作用" class="headerlink" title="apply、call 和 bind 的作用"></a>apply、call 和 bind 的作用</h1><p>​ 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。</p>
-<p>​ 而 apply、call 和 bind 就是可以<strong>显式的改变函数的 this 指向</strong>。</p>
+          <h1 id="apply、call-和-bind-的作用"><a href="#apply、call-和-bind-的作用" class="headerlink" title="apply、call 和 bind 的作用"></a>apply、call 和 bind 的作用</h1><p> 我们都知道，在 JavaScript 中，this 指针的指向是变换莫测的，在不同的环境下调用函数时，函数内部的 this 指向会根据调用的环境和对象来确定 this 指向，有关于 this 指针的指向，稍后我会在另一篇博客另作详解。</p>
+<p> 而 apply、call 和 bind 就是可以<strong>显式的改变函数的 this 指向</strong>。</p>
 <h1 id="apply、call-和-bind-的用法"><a href="#apply、call-和-bind-的用法" class="headerlink" title="apply、call 和 bind 的用法"></a>apply、call 和 bind 的用法</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Soda&quot;</span>,</span><br><span class="line">	<span class="attr">showName</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="built_in">this</span>.name);</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Cola&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">obj1.showName(); <span class="comment">// Soda</span></span><br><span class="line">obj1.showName.call(obj2); <span class="comment">// Cola</span></span><br><span class="line">obj1.showName.apply(obj2); <span class="comment">// Cola</span></span><br><span class="line">obj1.showName.bind(obj2)(); <span class="comment">// Cola</span></span><br></pre></td></tr></table></figure>
 
-<p>​ 可以看出，我们通过 apply、bind 和 call 可以显式的改变了函数的 this 指向，这里我们先说 call 和 apply 的区别，看下面的例子</p>
+<p> 可以看出，我们通过 apply、bind 和 call 可以显式的改变了函数的 this 指向，这里我们先说 call 和 apply 的区别，看下面的例子</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Soda&quot;</span>,</span><br><span class="line">	<span class="attr">showName</span>: <span class="function"><span class="keyword">function</span> (<span class="params">move1, move2</span>) </span>&#123;</span><br><span class="line">		<span class="built_in">console</span>.log(<span class="built_in">this</span>.name + move1 + move2);</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> obj2 = &#123;</span><br><span class="line">	<span class="attr">name</span>: <span class="string">&quot;Cola&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">obj1.showName.call(obj2, <span class="string">&quot;唱歌&quot;</span>, <span class="string">&quot;跳舞&quot;</span>); <span class="comment">// Cola唱歌跳舞</span></span><br><span class="line">obj1.showName.apply(obj2, [<span class="string">&quot;唱歌&quot;</span>, <span class="string">&quot;跳舞&quot;</span>]); <span class="comment">// Cola唱歌跳舞</span></span><br></pre></td></tr></table></figure>
 
-<p>​ 可以看出，通过 apply 绑定的函数传递的参数是数组类型的，而通过 call 绑定的函数传递的参数则是一个一个传入的。</p>
-<p>​ 在第一个例子我们可以看出，我们通过 bind 绑定的函数必须要再调用一次才会起作用，这是因为我们通过 bind 修改 this 的函数时，原来的函数不会立马调用，而是返回一个新的函数，我们需要通过去调用这个返回新的函数，才能得到最终的结果。而且 bind 修改 this 指向时，也可以传递参数，传递参数的方法和 apply 相同，也是传入一个数组。</p>
+<p> 可以看出，通过 apply 绑定的函数传递的参数是数组类型的，而通过 call 绑定的函数传递的参数则是一个一个传入的。</p>
+<p> 在第一个例子我们可以看出，我们通过 bind 绑定的函数必须要再调用一次才会起作用，这是因为我们通过 bind 修改 this 的函数时，原来的函数不会立马调用，而是返回一个新的函数，我们需要通过去调用这个返回新的函数，才能得到最终的结果。而且 bind 修改 this 指向时，也可以传递参数，传递参数的方法和 apply 相同，也是传入一个数组。</p>
 <h1 id="手写-apply、bind-和-call"><a href="#手写-apply、bind-和-call" class="headerlink" title="手写 apply、bind 和 call"></a>手写 apply、bind 和 call</h1><h1 id="call"><a href="#call" class="headerlink" title="call"></a>call</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myCall = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,...args</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.调用被执行的函数</span></span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...args);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//4.返回执行函数的结果</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="apply"><a href="#apply" class="headerlink" title="apply"></a>apply</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myApply = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">this</span>,argsArr</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//1.获取调用的函数</span></span><br><span class="line">    <span class="keyword">var</span> fn = <span class="built_in">this</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.判断this的类型 并将非对象类型转为Object类型</span></span><br><span class="line">    thisArg = (thisArg !== <span class="literal">null</span> &amp;&amp; thisArg !== <span class="literal">undefined</span>) ? <span class="built_in">Object</span>(thisArg): <span class="built_in">window</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.调用被执行的函数</span></span><br><span class="line">    thisArg.fn = fn;</span><br><span class="line">    argsArr = argsArr || [];<span class="comment">//判断是否有值，防止为空时在下面对undefined使用...报错</span></span><br><span class="line">    <span class="keyword">var</span> result = thisArg.fn(...argsArr);</span><br><span class="line">    Delete thisArg.fn;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//4.返回执行函数的结果</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -746,7 +825,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -757,7 +836,7 @@
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
