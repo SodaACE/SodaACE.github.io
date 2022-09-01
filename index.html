@@ -152,6 +152,126 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/01/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3BFC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Soda">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Soda的小破站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/01/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3BFC/" class="post-title-link" itemprop="url">深入理解BFC</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-01 20:35:05 / 修改时间：21:51:36" itemprop="dateCreated datePublished" datetime="2022-09-01T20:35:05+08:00">2022-09-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="BFC的定义"><a href="#BFC的定义" class="headerlink" title="BFC的定义"></a>BFC的定义</h1><p>​    BFC全称为<strong>Block Formatting Context</strong>，直译为”块级格式化上下文“。它是一个独立的渲染区域。只有<strong>Block-level bo</strong>x参与，它规定了内部的<strong>Block-level box</strong>如何布局，并且<strong>与这个区域外部毫不相干</strong>。</p>
+<blockquote>
+<p>block-level box即块级元素</p>
+</blockquote>
+<h1 id="BFC的生成"><a href="#BFC的生成" class="headerlink" title="BFC的生成"></a>BFC的生成</h1><p> 在MDN中，有总结BFC的生成方法：</p>
+<ul>
+<li><p>根元素（<html>）</p>
+</li>
+<li><p>浮动元素（元素的 float 不是 none）</p>
+</li>
+<li><p>绝对定位元素（元素的 position 为 absolute 或 fixed）</p>
+</li>
+<li><p>行内块元素（元素的 display 为 inline-block）</p>
+</li>
+<li><p>表格单元格（元素的 display 为 table-cell，HTML表格单元格默认为该值），表格标题（元素的 display 为 table-caption，HTML表格标题默认为该值）</p>
+</li>
+<li><p>匿名表格单元格元素（元素的 display 为 table、table-row、 table-row-group、table-header-group、table-footer-group（分别是HTML table、<br>row、tbody、thead、tfoot 的默认属性）或 inline-table）</p>
+</li>
+<li><p>overflow 计算值(Computed)不为 visible 的块元素</p>
+</li>
+<li><p>弹性元素（display 为 flex 或 inline-flex 元素的直接子元素）</p>
+</li>
+<li><p>网格元素（display 为 grid 或 inline-grid 元素的直接子元素）</p>
+</li>
+<li><p>display 值为 flow-root 的元素</p>
+</li>
+</ul>
+<h1 id="BFC的约束规则"><a href="#BFC的约束规则" class="headerlink" title="BFC的约束规则"></a>BFC的约束规则</h1><ol>
+<li>在BFC中，box会在垂直方向上一个挨着一个排布；</li>
+<li>垂直方向上的间距由margin属性决定；</li>
+<li>在同一个BFC中，相邻两个box之间的margin会被折叠</li>
+<li>在BFC中，每个元素的左边缘是紧挨着包含块的左边缘</li>
+</ol>
+<h1 id="BFC的作用"><a href="#BFC的作用" class="headerlink" title="BFC的作用"></a>BFC的作用</h1><h2 id="清除外边距margin折叠问题"><a href="#清除外边距margin折叠问题" class="headerlink" title="清除外边距margin折叠问题"></a>清除外边距margin折叠问题</h2><p>​    首先我们看个案例：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css">	<span class="selector-class">.box1</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: aquamarine;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-bottom</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.box2</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: pink;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-top</span>: <span class="number">50px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span>	</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box1&quot;</span>&gt;</span>box1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box2&quot;</span>&gt;</span>box2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<img src="https://gitee.com/soda18/picGo/raw/master/image/202209012123237.png" alt="image-20220901212253085" style="zoom:50%;" />
+
+<p>​    我们分别给两个box设置了对应的margin，理论上两个box的间距应该是box1的margin-bottom的100px加上box2的margin-top的50px，一共为150px，可实际上由于这<strong>两个box处在同一个BFC</strong>中，造成了<strong>margin折叠</strong>，所以两个盒子之间的margin为较大的那个值，即100px。要解决margin折叠，我们可以让<strong>两个盒子处在两个BFC</strong>中，这样就可以解决margin折叠问题。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css">	<span class="selector-class">.box1</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: aquamarine;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-bottom</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">    <span class="selector-class">.wrap</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">overflow</span>: hidden;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.box2</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: pink;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-top</span>: <span class="number">50px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span>	</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box1&quot;</span>&gt;</span>box1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;wrap&quot;</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box2&quot;</span>&gt;</span>box2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>​    我们可以给box2添加一个wrap，然后通过overflow:hidden触发这个box2的BFC，让box1和box2处于两个不同的BFC中，这样就可以解决外边距margin的折叠问题。</p>
+<p>​    可能有人会问，为啥不直接给box2设置overflow:hidden属性，这样box1和box2不也是处在两个不同的BFC了吗？答案肯定是不行的，前面我们说过，html根元素本身就会触发BFC，如果我们单纯的给box2设置，box1和box2依旧处在同一个BFC（根元素触发的BFC）中，而我们嵌套了一层后，box2处于的BFC是wrap创造的，box1处于的BFC是html根元素创造的。</p>
+<h2 id="解决浮动高度塌陷"><a href="#解决浮动高度塌陷" class="headerlink" title="解决浮动高度塌陷"></a>解决浮动高度塌陷</h2><p>​    我们先看案例</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css">	<span class="selector-class">.box1</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">float</span>: left;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: aquamarine;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.box2</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">float</span>: left;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: pink;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.wrap</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">border</span>: <span class="number">5px</span> solid red;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span>	</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;wrap&quot;</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box1&quot;</span>&gt;</span>box1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box2&quot;</span>&gt;</span>box2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://gitee.com/soda18/picGo/raw/master/image/202209012149049.png" alt="image-20220901214911952"></p>
+<p>​    我们给两个盒子设置了浮动，但是没由给父元素高度，而浮动元素本身是不占据原来的位置的，所以造成父元素的高度塌陷，如果我们给wrap设置一个overflow:hidden，来触发父元素的BFC，则可以解决高度塌陷的问题。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrap</span> &#123;</span><br><span class="line">	<span class="attribute">border</span>: <span class="number">5px</span> solid red;</span><br><span class="line">	<span class="attribute">overflow</span>: hidden;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/soda18/picGo/raw/master/image/202209012151716.png" alt="image-20220901215130585"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/31/%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -825,18 +945,18 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>

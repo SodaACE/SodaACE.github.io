@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="BFC的定义​    BFC全称为Block Formatting Context，直译为”块级格式化上下文“。它是一个独立的渲染区域。只有Block-level box参与，它规定了内部的Block-level box如何布局，并且与这个区域外部毫不相干。  block-level box即块级元素  BFC的生成 在MDN中，有总结BFC的生成方法：  根元素（）  浮动元素（元素的 floa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解BFC">
+<meta property="og:url" content="http://example.com/2022/09/01/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3BFC/index.html">
+<meta property="og:site_name" content="Soda的小破站">
+<meta property="og:description" content="BFC的定义​    BFC全称为Block Formatting Context，直译为”块级格式化上下文“。它是一个独立的渲染区域。只有Block-level box参与，它规定了内部的Block-level box如何布局，并且与这个区域外部毫不相干。  block-level box即块级元素  BFC的生成 在MDN中，有总结BFC的生成方法：  根元素（）  浮动元素（元素的 floa">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/soda18/picGo/raw/master/image/202209012123237.png">
+<meta property="og:image" content="https://gitee.com/soda18/picGo/raw/master/image/202209012149049.png">
+<meta property="og:image" content="https://gitee.com/soda18/picGo/raw/master/image/202209012151716.png">
+<meta property="article:published_time" content="2022-09-01T12:35:05.967Z">
+<meta property="article:modified_time" content="2022-09-01T13:51:36.750Z">
+<meta property="article:author" content="Soda">
+<meta property="article:tag" content="CSS BFC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/soda18/picGo/raw/master/image/202209012123237.png">
+
+<link rel="canonical" href="http://example.com/2022/09/01/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3BFC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>深入理解BFC | Soda的小破站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Soda的小破站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/sodace" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/01/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3BFC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Soda">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Soda的小破站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深入理解BFC
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-01 20:35:05 / 修改时间：21:51:36" itemprop="dateCreated datePublished" datetime="2022-09-01T20:35:05+08:00">2022-09-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="BFC的定义"><a href="#BFC的定义" class="headerlink" title="BFC的定义"></a>BFC的定义</h1><p>​    BFC全称为<strong>Block Formatting Context</strong>，直译为”块级格式化上下文“。它是一个独立的渲染区域。只有<strong>Block-level bo</strong>x参与，它规定了内部的<strong>Block-level box</strong>如何布局，并且<strong>与这个区域外部毫不相干</strong>。</p>
+<blockquote>
+<p>block-level box即块级元素</p>
+</blockquote>
+<h1 id="BFC的生成"><a href="#BFC的生成" class="headerlink" title="BFC的生成"></a>BFC的生成</h1><p> 在MDN中，有总结BFC的生成方法：</p>
+<ul>
+<li><p>根元素（<html>）</p>
+</li>
+<li><p>浮动元素（元素的 float 不是 none）</p>
+</li>
+<li><p>绝对定位元素（元素的 position 为 absolute 或 fixed）</p>
+</li>
+<li><p>行内块元素（元素的 display 为 inline-block）</p>
+</li>
+<li><p>表格单元格（元素的 display 为 table-cell，HTML表格单元格默认为该值），表格标题（元素的 display 为 table-caption，HTML表格标题默认为该值）</p>
+</li>
+<li><p>匿名表格单元格元素（元素的 display 为 table、table-row、 table-row-group、table-header-group、table-footer-group（分别是HTML table、<br>row、tbody、thead、tfoot 的默认属性）或 inline-table）</p>
+</li>
+<li><p>overflow 计算值(Computed)不为 visible 的块元素</p>
+</li>
+<li><p>弹性元素（display 为 flex 或 inline-flex 元素的直接子元素）</p>
+</li>
+<li><p>网格元素（display 为 grid 或 inline-grid 元素的直接子元素）</p>
+</li>
+<li><p>display 值为 flow-root 的元素</p>
+</li>
+</ul>
+<h1 id="BFC的约束规则"><a href="#BFC的约束规则" class="headerlink" title="BFC的约束规则"></a>BFC的约束规则</h1><ol>
+<li>在BFC中，box会在垂直方向上一个挨着一个排布；</li>
+<li>垂直方向上的间距由margin属性决定；</li>
+<li>在同一个BFC中，相邻两个box之间的margin会被折叠</li>
+<li>在BFC中，每个元素的左边缘是紧挨着包含块的左边缘</li>
+</ol>
+<h1 id="BFC的作用"><a href="#BFC的作用" class="headerlink" title="BFC的作用"></a>BFC的作用</h1><h2 id="清除外边距margin折叠问题"><a href="#清除外边距margin折叠问题" class="headerlink" title="清除外边距margin折叠问题"></a>清除外边距margin折叠问题</h2><p>​    首先我们看个案例：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css">	<span class="selector-class">.box1</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: aquamarine;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-bottom</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.box2</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: pink;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-top</span>: <span class="number">50px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span>	</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box1&quot;</span>&gt;</span>box1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box2&quot;</span>&gt;</span>box2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<img src="https://gitee.com/soda18/picGo/raw/master/image/202209012123237.png" alt="image-20220901212253085" style="zoom:50%;" />
+
+<p>​    我们分别给两个box设置了对应的margin，理论上两个box的间距应该是box1的margin-bottom的100px加上box2的margin-top的50px，一共为150px，可实际上由于这<strong>两个box处在同一个BFC</strong>中，造成了<strong>margin折叠</strong>，所以两个盒子之间的margin为较大的那个值，即100px。要解决margin折叠，我们可以让<strong>两个盒子处在两个BFC</strong>中，这样就可以解决margin折叠问题。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css">	<span class="selector-class">.box1</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: aquamarine;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-bottom</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">    <span class="selector-class">.wrap</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">overflow</span>: hidden;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.box2</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: pink;</span></span><br><span class="line"><span class="css">		<span class="attribute">margin-top</span>: <span class="number">50px</span>;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span>	</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box1&quot;</span>&gt;</span>box1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;wrap&quot;</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box2&quot;</span>&gt;</span>box2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>​    我们可以给box2添加一个wrap，然后通过overflow:hidden触发这个box2的BFC，让box1和box2处于两个不同的BFC中，这样就可以解决外边距margin的折叠问题。</p>
+<p>​    可能有人会问，为啥不直接给box2设置overflow:hidden属性，这样box1和box2不也是处在两个不同的BFC了吗？答案肯定是不行的，前面我们说过，html根元素本身就会触发BFC，如果我们单纯的给box2设置，box1和box2依旧处在同一个BFC（根元素触发的BFC）中，而我们嵌套了一层后，box2处于的BFC是wrap创造的，box1处于的BFC是html根元素创造的。</p>
+<h2 id="解决浮动高度塌陷"><a href="#解决浮动高度塌陷" class="headerlink" title="解决浮动高度塌陷"></a>解决浮动高度塌陷</h2><p>​    我们先看案例</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css">	<span class="selector-class">.box1</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">float</span>: left;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: aquamarine;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.box2</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">float</span>: left;</span></span><br><span class="line"><span class="css">		<span class="attribute">width</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="css">		<span class="attribute">background-color</span>: pink;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css">	<span class="selector-class">.wrap</span> &#123;</span></span><br><span class="line"><span class="css">		<span class="attribute">border</span>: <span class="number">5px</span> solid red;</span></span><br><span class="line"><span class="css">	&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span>	</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;wrap&quot;</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box1&quot;</span>&gt;</span>box1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box2&quot;</span>&gt;</span>box2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://gitee.com/soda18/picGo/raw/master/image/202209012149049.png" alt="image-20220901214911952"></p>
+<p>​    我们给两个盒子设置了浮动，但是没由给父元素高度，而浮动元素本身是不占据原来的位置的，所以造成父元素的高度塌陷，如果我们给wrap设置一个overflow:hidden，来触发父元素的BFC，则可以解决高度塌陷的问题。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrap</span> &#123;</span><br><span class="line">	<span class="attribute">border</span>: <span class="number">5px</span> solid red;</span><br><span class="line">	<span class="attribute">overflow</span>: hidden;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/soda18/picGo/raw/master/image/202209012151716.png" alt="image-20220901215130585"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS-BFC/" rel="tag"># CSS BFC</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/08/31/%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0/" rel="prev" title="组合函数的应用与实现">
+      <i class="fa fa-chevron-left"></i> 组合函数的应用与实现
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BFC%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">BFC的定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BFC%E7%9A%84%E7%94%9F%E6%88%90"><span class="nav-number">2.</span> <span class="nav-text">BFC的生成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BFC%E7%9A%84%E7%BA%A6%E6%9D%9F%E8%A7%84%E5%88%99"><span class="nav-number">3.</span> <span class="nav-text">BFC的约束规则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BFC%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">BFC的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E5%A4%96%E8%BE%B9%E8%B7%9Dmargin%E6%8A%98%E5%8F%A0%E9%97%AE%E9%A2%98"><span class="nav-number">4.1.</span> <span class="nav-text">清除外边距margin折叠问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%B5%AE%E5%8A%A8%E9%AB%98%E5%BA%A6%E5%A1%8C%E9%99%B7"><span class="nav-number">4.2.</span> <span class="nav-text">解决浮动高度塌陷</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Soda"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Soda</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/sodaace" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;sodaace" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1269551702@qq.com" title="E-Mail → mailto:1269551702@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Soda</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
