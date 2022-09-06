@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="​    vue中组件通信有很多种，而在vue2和vue3中，组件通信实现的方式也会有很多的差异，本文就根据optionsAPI、compositionAPI以及setup语法糖三个方面来介绍vue2和vue3中实现组件通信的方式。 props​    props是组件中父传子最常见的通信方式之一。父组件通过v-bind传入，子组件通过prop接收。 optionsAPI1234567891011">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue中的组件通信">
+<meta property="og:url" content="http://example.com/2022/09/05/vue%E4%B8%AD%E7%9A%84%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/index.html">
+<meta property="og:site_name" content="Soda的小破站">
+<meta property="og:description" content="​    vue中组件通信有很多种，而在vue2和vue3中，组件通信实现的方式也会有很多的差异，本文就根据optionsAPI、compositionAPI以及setup语法糖三个方面来介绍vue2和vue3中实现组件通信的方式。 props​    props是组件中父传子最常见的通信方式之一。父组件通过v-bind传入，子组件通过prop接收。 optionsAPI1234567891011">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-05T14:01:12.436Z">
+<meta property="article:modified_time" content="2022-09-06T04:42:55.598Z">
+<meta property="article:author" content="Soda">
+<meta property="article:tag" content="vue 组件通信">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/09/05/vue%E4%B8%AD%E7%9A%84%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>vue中的组件通信 | Soda的小破站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Soda的小破站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/sodace" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/05/vue%E4%B8%AD%E7%9A%84%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Soda">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Soda的小破站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vue中的组件通信
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-05 22:01:12" itemprop="dateCreated datePublished" datetime="2022-09-05T22:01:12+08:00">2022-09-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-09-06 12:42:55" itemprop="dateModified" datetime="2022-09-06T12:42:55+08:00">2022-09-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">vue</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>​    vue中组件通信有很多种，而在vue2和vue3中，组件通信实现的方式也会有很多的差异，本文就根据optionsAPI、compositionAPI以及setup语法糖三个方面来介绍vue2和vue3中实现组件通信的方式。</p>
+<h1 id="props"><a href="#props" class="headerlink" title="props"></a>props</h1><p>​    props是组件中父传子最常见的通信方式之一。<strong>父组件</strong>通过<strong>v-bind传入</strong>，<strong>子组件</strong>通过<strong>prop接收</strong>。</p>
+<h2 id="optionsAPI"><a href="#optionsAPI" class="headerlink" title="optionsAPI"></a>optionsAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child :msg=&quot;parentMsg&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">export default &#123;</span><br><span class="line">  components:&#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      parentMsg: &#x27;ParentMsg&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &#123;&#123;msg&#125;&#125;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  props:[&#x27;msg&#x27;]</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="compositionAPI"><a href="#compositionAPI" class="headerlink" title="compositionAPI"></a>compositionAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child :msg=&quot;parentMsg&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref,defineComponent &#125; from &#x27;vue&#x27;</span><br><span class="line">import Child from &#x27;./Child.vue&#x27;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  components:&#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const parentMsg = ref(&#x27;ParentMsg&#x27;)</span><br><span class="line">    return &#123;</span><br><span class="line">      parentMsg</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &#123;&#123; parentMsg &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; defineComponent,toRef &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">    props: [&quot;msg&quot;],</span><br><span class="line">    setup(props) &#123;</span><br><span class="line">        let parentMsg = toRef(props, &#x27;msg&#x27;) //将父组件的传来的msg转换为ref对象</span><br><span class="line">        return &#123;</span><br><span class="line">            parentMsg</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="setup语法糖"><a href="#setup语法糖" class="headerlink" title="setup语法糖"></a>setup语法糖</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child :msg=&quot;parentMsg&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; ref &#125; from &#x27;vue&#x27;</span><br><span class="line">import Child from &#x27;./Child.vue&#x27;</span><br><span class="line">const parentMsg = ref(&#x27;parentMsg&#x27;)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &#123;&#123; parentMsg &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; toRef, defineProps &#125; from &quot;vue&quot;;</span><br><span class="line">const props = defineProps([&quot;msg&quot;]);</span><br><span class="line">let parentMsg = toRef(props, &#x27;msg&#x27;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="emit"><a href="#emit" class="headerlink" title="emit"></a>emit</h1><p>​    emit是组件中子传父最常见的通信方式之一。<strong>子组件</strong>通过<strong>emit发送事件</strong>，<strong>父组件</strong>通过<strong>v-on绑定事件</strong>。</p>
+<h2 id="optionsAPI-1"><a href="#optionsAPI-1" class="headerlink" title="optionsAPI"></a>optionsAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child @sendMsg=&quot;getMsgFromChild&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">export default &#123;</span><br><span class="line">  components:&#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    getMsgFromChild(val) &#123;</span><br><span class="line">      console.log(val) //&#x27;Hello World&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">// 子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;button @click=&quot;passMsg&quot;&gt;send&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  methods:&#123;</span><br><span class="line">    passMsg()&#123;</span><br><span class="line">      this.$emit(&#x27;sendMsg&#x27;,&#x27;Hello World&#x27;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="compositionAPI-1"><a href="#compositionAPI-1" class="headerlink" title="compositionAPI"></a>compositionAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child @sendMsg=&quot;getFromChild&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">import &#123; defineComponent &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const getMsgFromChild = (val) =&gt; &#123;</span><br><span class="line">      console.log(val) //&#x27;Hello World&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">    return &#123;</span><br><span class="line">      getMsgFromChild</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;button @click=&quot;passMsg&quot;&gt;send&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; defineComponent &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">    emits: [&#x27;sendMsg&#x27;],</span><br><span class="line">    setup(props, ctx) &#123;</span><br><span class="line">        const passMsg = () =&gt; &#123;</span><br><span class="line">            ctx.emit(&#x27;sendMsg&#x27;, &#x27;Hello World&#x27;)</span><br><span class="line">        &#125;</span><br><span class="line">        return &#123;</span><br><span class="line">            passMsg</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="setup语法糖-1"><a href="#setup语法糖-1" class="headerlink" title="setup语法糖"></a>setup语法糖</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child @passMsg=&quot;getMsgFromChild&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">const getMsgFromChild = (val) =&gt; &#123;</span><br><span class="line">      console.log(val) //Hello World</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;button @click=&quot;passMsg&quot;&gt;send&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; defineEmits &#125; from &quot;vue&quot;;</span><br><span class="line">const emits = defineEmits([&#x27;passMsg&#x27;])</span><br><span class="line">const passMsg = () =&gt; &#123;</span><br><span class="line">    emits(&#x27;sendMsg&#x27;, &#x27;Hello World&#x27;)</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="attrs和-listeners"><a href="#attrs和-listeners" class="headerlink" title="$attrs和$listeners"></a>$attrs和$listeners</h1><p>​    通过$attrs可以访问<strong>非props的所有attribute</strong>，$listeners可以获得<strong>父组件(不含.native修饰器的)所有v-on事件监听器</strong>（在vue3中该方法已被删除，但是在vue3中，$attrs既可以获得所有的非props的attribute，还可以获得父组件所有的v-on事件监听器）</p>
+<h2 id="optionsAPI-2"><a href="#optionsAPI-2" class="headerlink" title="optionsAPI"></a>optionsAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">     &lt;Child @sendMsg=&quot;getMsgFromChild&quot; :name=&quot;name&quot; :age=&quot;age&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">export default &#123;</span><br><span class="line">  components:&#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  data()&#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      name:&#x27;Soda&#x27;,</span><br><span class="line">      age:20</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    getMsgFromChild(val) &#123;</span><br><span class="line">      console.log(`父组件方法被调用,获得子组件传值：$&#123;val&#125;`)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;button @click=&quot;passMsg&quot;&gt;调用父组件方法&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  methods:&#123;</span><br><span class="line">    passMsg()&#123;</span><br><span class="line">      this.$listeners.sendMsg(&#x27;Hello World&#x27;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  created()&#123;</span><br><span class="line">    //获取父组件中所有绑定属性</span><br><span class="line">    console.log(this.$attrs)  //&#123;&quot;name&quot;: &quot;Soda&quot;,&quot;age&quot;: &quot;18&quot;&#125;</span><br><span class="line">    //获取父组件中所有绑定方法    </span><br><span class="line">    console.log(this.$listeners) //&#123;sendMsg:f&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="compositionAPI-2"><a href="#compositionAPI-2" class="headerlink" title="compositionAPI"></a>compositionAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child @sendMsg=&quot;getMsgFromChild&quot; :name=&quot;name&quot; :age=&quot;age&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">import &#123; defineComponent,ref &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">const name = ref(&quot;Soda&quot;);</span><br><span class="line">const age = ref(20);</span><br><span class="line">    const getMsgFromChild = (val) =&gt; &#123;</span><br><span class="line">      console.log(`父组件方法被调用,获得子组件传值：$&#123;val&#125;`)</span><br><span class="line">    &#125;</span><br><span class="line">    return &#123;</span><br><span class="line">      getMsgFromChild,</span><br><span class="line">      msg1,</span><br><span class="line">      msg2</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;button @click=&quot;passMsg&quot;&gt;调用父组件方法&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; defineComponent &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">    setup(props, ctx) &#123;</span><br><span class="line">        //获取父组件方法和事件</span><br><span class="line">        console.log(ctx.attrs) //Proxy &#123;&quot;name&quot;: &quot;Soda&quot;,&quot;age&quot;: &quot;18&quot;,onSendMsg: ƒ&#125;</span><br><span class="line">        const passMsg = () =&gt; &#123;</span><br><span class="line">            //调用父组件方法</span><br><span class="line">            ctx.attrs.onSendMsg(&#x27;Hello World&#x27;)</span><br><span class="line">        &#125;</span><br><span class="line">        return &#123;</span><br><span class="line">            passMsg,</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="setup语法糖-2"><a href="#setup语法糖-2" class="headerlink" title="setup语法糖"></a>setup语法糖</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">	&lt;div&gt;</span><br><span class="line">		&lt;Child @sendMsg=&quot;getMsgFromChild&quot; :name=&quot;name&quot; :age=&quot;age&quot; /&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import Child from &quot;./Child&quot;;</span><br><span class="line">import &#123; ref &#125; from &quot;vue&quot;;</span><br><span class="line">const name = ref(&quot;Soda&quot;);</span><br><span class="line">const age = ref(20);</span><br><span class="line">const getMsgFromChild = (val) =&gt; &#123;</span><br><span class="line">	console.log(`父组件方法被调用,获得子组件传值：$&#123;val&#125;`);</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">	&lt;div&gt;</span><br><span class="line">		&lt;button @click=&quot;passMsg&quot;&gt;调用父组件方法&lt;/button&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; useAttrs &#125; from &quot;vue&quot;;</span><br><span class="line"></span><br><span class="line">const attrs = useAttrs();</span><br><span class="line">//获取父组件方法和事件</span><br><span class="line">console.log(attrs); //Proxy &#123;&quot;name&quot;: &quot;Soda&quot;,&quot;age&quot;: &quot;18&quot;,onSendMsg: ƒ&#125;</span><br><span class="line">const passMsg = () =&gt; &#123;</span><br><span class="line">	//调用父组件方法</span><br><span class="line">	attrs.onSendMsg(&quot;Hello World&quot;);</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="provide-x2F-inject"><a href="#provide-x2F-inject" class="headerlink" title="provide&#x2F;inject"></a>provide&#x2F;inject</h1><p>​    provide&#x2F;inject一般用于深度嵌套的组件，子组件想获取父组件的内容，通过<strong>props逐级传递会非常麻烦</strong>，这时候我们就可以使用provide&#x2F;inject来为我们传递数据。</p>
+<p>​    </p>
+<h2 id="optionsAPI-3"><a href="#optionsAPI-3" class="headerlink" title="optionsAPI"></a>optionsAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">export default &#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      msg1: &#x27;Hello World&#x27;,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  provide() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      msg1: this.msg1,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  inject:[&#x27;msg1&#x27;],</span><br><span class="line">  created()&#123;</span><br><span class="line">    console.log(this.msg1) // Hello World</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="compositionAPI-3"><a href="#compositionAPI-3" class="headerlink" title="compositionAPI"></a>compositionAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">import &#123; ref, defineComponent,provide &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  components:&#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const name = ref(&#x27;Soda&#x27;)</span><br><span class="line">    const age = ref(18)</span><br><span class="line">    provide(&quot;msg1&quot;, name)</span><br><span class="line">    provide(&quot;msg2&quot;, age)</span><br><span class="line">    return &#123;</span><br><span class="line">      name,</span><br><span class="line">      age</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; inject, defineComponent &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">    setup() &#123;</span><br><span class="line">        console.log(inject(&#x27;msg1&#x27;).value) //Soda</span><br><span class="line">        console.log(inject(&#x27;msg2&#x27;).value) //18</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="setup语法糖-3"><a href="#setup语法糖-3" class="headerlink" title="setup语法糖"></a>setup语法糖</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">import &#123; ref，provide &#125; from &quot;vue&quot;;</span><br><span class="line">const name = ref(&#x27;Soda&#x27;)</span><br><span class="line">const age = ref(18)</span><br><span class="line">provide(&quot;msg1&quot;, name)</span><br><span class="line">provide(&quot;msg2&quot;, age)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; inject&#125; from &quot;vue&quot;;</span><br><span class="line">console.log(inject(&#x27;msg1&#x27;).value) //Soda</span><br><span class="line">console.log(inject(&#x27;msg2&#x27;).value) //18</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="parent-x2F-children"><a href="#parent-x2F-children" class="headerlink" title="$parent&#x2F;$children"></a>$parent&#x2F;$children</h1><p>​    该方法在vue3中已经废除，$parent是在<strong>子组件中获取父组件的vue实例</strong>；$children是在父组件获取子组件的vue实例，返回值是一个<strong>无序数组</strong>。</p>
+<h1 id="ref-amp-expose"><a href="#ref-amp-expose" class="headerlink" title="ref&amp;expose"></a>ref&amp;expose</h1><p>​    通过$ref我们可以直接获得元素属性或者组件实例中的属性和方法。</p>
+<h2 id="optionsAPI-4"><a href="#optionsAPI-4" class="headerlink" title="optionsAPI"></a>optionsAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child ref=&quot;child&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">export default &#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted()&#123;</span><br><span class="line">    //获取子组件属性</span><br><span class="line">    console.log(this.$refs.child.name) //Soda</span><br><span class="line"></span><br><span class="line">    //调用子组件方法</span><br><span class="line">    this.$refs.child.showMsg(&#x27;vue&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件 </span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  data()&#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      name:&#x27;Soda&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods:&#123;</span><br><span class="line">    showMsg(val)&#123;</span><br><span class="line">      console.log(`Hello World` + val)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="compositionAPI-4"><a href="#compositionAPI-4" class="headerlink" title="compositionAPI"></a>compositionAPI</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child ref=&quot;child&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">import &#123; ref, defineComponent, onMounted &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  setup() &#123;</span><br><span class="line">    const child = ref() </span><br><span class="line">    onMounted(() =&gt; &#123;</span><br><span class="line">      console.log(child.value.name) //Soda</span><br><span class="line">      child.value.showMsg(&#x27;vue&#x27;)</span><br><span class="line">    &#125;)</span><br><span class="line">    return &#123;</span><br><span class="line">      child</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; defineComponent, ref &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">    setup() &#123;</span><br><span class="line">        const name = ref(&#x27;Soda&#x27;)</span><br><span class="line">        const showMsg = (val) =&gt; &#123;</span><br><span class="line">            console.log(`Hello World` + val)</span><br><span class="line">        &#125;</span><br><span class="line">        return &#123;</span><br><span class="line">            name,</span><br><span class="line">            showMsg</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="setup语法糖-4"><a href="#setup语法糖-4" class="headerlink" title="setup语法糖"></a>setup语法糖</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">/父组件</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Child ref=&quot;child&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child from &#x27;./Child&#x27;</span><br><span class="line">import &#123; ref, onMounted &#125; from &quot;vue&quot;;</span><br><span class="line">const child = ref() </span><br><span class="line">onMounted(() =&gt; &#123;</span><br><span class="line">  console.log(child.value.name) //Soda</span><br><span class="line">  child.value.showMsg(&#x27;vue&#x27;)</span><br><span class="line">&#125;)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//子组件</span><br><span class="line"></span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123;ref,defineExpose &#125; from &quot;vue&quot;;</span><br><span class="line">const name = ref(&#x27;Soda&#x27;)</span><br><span class="line">const showMsg = (val) =&gt; &#123;</span><br><span class="line">    console.log(`Hello World` + val)</span><br><span class="line">&#125;</span><br><span class="line">defineExpose(&#123;</span><br><span class="line">    name,</span><br><span class="line">    showMsg</span><br><span class="line">&#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="EventBus-amp-mitt"><a href="#EventBus-amp-mitt" class="headerlink" title="EventBus &amp; mitt"></a>EventBus &amp; mitt</h1><p>​    Eventbus是在vue2中使用的事件总线，在vue3中，我们使用mitt来替代Eventbus.</p>
+<h2 id="EventBus"><a href="#EventBus" class="headerlink" title="EventBus"></a>EventBus</h2><h3 id="optionsAPI-5"><a href="#optionsAPI-5" class="headerlink" title="optionsAPI"></a>optionsAPI</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">//main.js</span><br><span class="line">Vue.prototype.$EventBus = new Vue() //初始化</span><br><span class="line"></span><br><span class="line">&lt;!-- A.vue --&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;button @click=&quot;sendMsg()&quot;&gt;-&lt;/button&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt; </span><br><span class="line">import &#123; EventBus &#125; from &quot;../event-bus.js&quot;;</span><br><span class="line">export default &#123;</span><br><span class="line">  methods: &#123;</span><br><span class="line">    sendMsg() &#123;</span><br><span class="line">      this.$EventBus.$emit(&quot;fromAMsg&quot;, &#x27;Hello World&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;; </span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- B.vue --&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;p&gt;&#123;&#123;msgB&#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt; </span><br><span class="line">export default &#123;</span><br><span class="line">  data()&#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      msgB: &#x27;&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods:&#123;</span><br><span class="line">    getMsg(data) &#123;</span><br><span class="line">		this.msgB = data;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted() &#123;</span><br><span class="line">    this.$EventBus.$on(&quot;fromAMsg&quot;,this.getMsg);</span><br><span class="line">  &#125;,</span><br><span class="line">  destroyed() &#123;</span><br><span class="line">    this.$EventBus.$off(&quot;fromAMsg&quot;,this.getMsg);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt; </span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="mitt"><a href="#mitt" class="headerlink" title="mitt"></a>mitt</h2><p>​    我们首先可以在utils中单独封装一个模块，将事件总线给暴露出去</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//utils/mitt.js</span></span><br><span class="line"><span class="keyword">import</span> mitt <span class="keyword">from</span> <span class="string">&quot;mitt&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> emitter = mitt();</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> emitter;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="compositionAPI-5"><a href="#compositionAPI-5" class="headerlink" title="compositionAPI"></a>compositionAPI</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">//组件1</span><br><span class="line">&lt;template&gt;</span><br><span class="line">     &lt;button @click=&quot;sendMsg&quot;&gt;传值&lt;/button&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; defineComponent &#125; from &quot;vue&quot;;</span><br><span class="line">import Mitt from &#x27;./mitt.js&#x27;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">    setup() &#123;</span><br><span class="line">        const sendMsg = () =&gt; &#123;</span><br><span class="line">            Mitt.emit(&#x27;sendMsg&#x27;,&#x27;Hello World&#x27;)</span><br><span class="line">        &#125;</span><br><span class="line">        return &#123;</span><br><span class="line">           sendMsg</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//组件2</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; defineComponent, onUnmounted &#125; from &quot;vue&quot;;</span><br><span class="line">import Mitt from &#x27;./utils/mitt.js&#x27;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  setup() &#123;</span><br><span class="line">    const getMsg = (val) =&gt; &#123;</span><br><span class="line">      console.log(val);</span><br><span class="line">    &#125;</span><br><span class="line">    Mitt.on(&#x27;sendMsg&#x27;, getMsg)</span><br><span class="line">    onUnmounted(() =&gt; &#123;</span><br><span class="line">      Mitt.off(&#x27;sendMsg&#x27;, getMsg)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="setup语法糖-5"><a href="#setup语法糖-5" class="headerlink" title="setup语法糖"></a>setup语法糖</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">//组件1</span><br><span class="line">&lt;template&gt;</span><br><span class="line">     &lt;button @click=&quot;sendMsg&quot;&gt;传值&lt;/button&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line"></span><br><span class="line">import Mitt from &#x27;./mitt.js&#x27;</span><br><span class="line">const sendMsg = () =&gt; &#123;</span><br><span class="line">    Mitt.emit(&#x27;sendMsg&#x27;,&#x27;Hello World&#x27;)</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">//组件2</span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; onUnmounted &#125; from &quot;vue&quot;;</span><br><span class="line">import Mitt from &#x27;./utils/mitt.js&#x27;</span><br><span class="line">const getMsg = (val) =&gt; &#123;</span><br><span class="line">  console.log(val);</span><br><span class="line">&#125;</span><br><span class="line">Mitt.on(&#x27;sendMsg&#x27;, getMsg)</span><br><span class="line">onUnmounted(() =&gt; &#123;</span><br><span class="line">  Mitt.off(&#x27;sendMsg&#x27;, getMsg)</span><br><span class="line">&#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="vuex-amp-Pinia"><a href="#vuex-amp-Pinia" class="headerlink" title="vuex &amp;Pinia"></a>vuex &amp;Pinia</h1><p>​    这两种状态管理库的作用相当于一个用来存储共享变量的容器，其适用场景为复杂关系的组件数据传递，关于他们两个的使用以及差别，后续我会在博客中的其他文章写到。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/vue-%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/" rel="tag"># vue 组件通信</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/02/webpack%E4%B8%ADloader%E5%92%8Cplugin%E7%9A%84%E5%8C%BA%E5%88%AB/" rel="prev" title="webpack中loader和plugin的区别">
+      <i class="fa fa-chevron-left"></i> webpack中loader和plugin的区别
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#props"><span class="nav-number">1.</span> <span class="nav-text">props</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#optionsAPI"><span class="nav-number">1.1.</span> <span class="nav-text">optionsAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compositionAPI"><span class="nav-number">1.2.</span> <span class="nav-text">compositionAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="nav-number">1.3.</span> <span class="nav-text">setup语法糖</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#emit"><span class="nav-number">2.</span> <span class="nav-text">emit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#optionsAPI-1"><span class="nav-number">2.1.</span> <span class="nav-text">optionsAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compositionAPI-1"><span class="nav-number">2.2.</span> <span class="nav-text">compositionAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup%E8%AF%AD%E6%B3%95%E7%B3%96-1"><span class="nav-number">2.3.</span> <span class="nav-text">setup语法糖</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#attrs%E5%92%8C-listeners"><span class="nav-number">3.</span> <span class="nav-text">$attrs和$listeners</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#optionsAPI-2"><span class="nav-number">3.1.</span> <span class="nav-text">optionsAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compositionAPI-2"><span class="nav-number">3.2.</span> <span class="nav-text">compositionAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup%E8%AF%AD%E6%B3%95%E7%B3%96-2"><span class="nav-number">3.3.</span> <span class="nav-text">setup语法糖</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#provide-x2F-inject"><span class="nav-number">4.</span> <span class="nav-text">provide&#x2F;inject</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#optionsAPI-3"><span class="nav-number">4.1.</span> <span class="nav-text">optionsAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compositionAPI-3"><span class="nav-number">4.2.</span> <span class="nav-text">compositionAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup%E8%AF%AD%E6%B3%95%E7%B3%96-3"><span class="nav-number">4.3.</span> <span class="nav-text">setup语法糖</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#parent-x2F-children"><span class="nav-number">5.</span> <span class="nav-text">$parent&#x2F;$children</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ref-amp-expose"><span class="nav-number">6.</span> <span class="nav-text">ref&amp;expose</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#optionsAPI-4"><span class="nav-number">6.1.</span> <span class="nav-text">optionsAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compositionAPI-4"><span class="nav-number">6.2.</span> <span class="nav-text">compositionAPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup%E8%AF%AD%E6%B3%95%E7%B3%96-4"><span class="nav-number">6.3.</span> <span class="nav-text">setup语法糖</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#EventBus-amp-mitt"><span class="nav-number">7.</span> <span class="nav-text">EventBus &amp; mitt</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EventBus"><span class="nav-number">7.1.</span> <span class="nav-text">EventBus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#optionsAPI-5"><span class="nav-number">7.1.1.</span> <span class="nav-text">optionsAPI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mitt"><span class="nav-number">7.2.</span> <span class="nav-text">mitt</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#compositionAPI-5"><span class="nav-number">7.2.1.</span> <span class="nav-text">compositionAPI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setup%E8%AF%AD%E6%B3%95%E7%B3%96-5"><span class="nav-number">7.2.2.</span> <span class="nav-text">setup语法糖</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vuex-amp-Pinia"><span class="nav-number">8.</span> <span class="nav-text">vuex &amp;Pinia</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Soda"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Soda</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/sodaace" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;sodaace" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1269551702@qq.com" title="E-Mail → mailto:1269551702@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Soda</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
