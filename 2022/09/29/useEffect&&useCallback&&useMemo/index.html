@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="useEffect作用​    在该Effect Hook中，我们可以完成类似于class组件中生命周期的功能。类似于更新DOM、发送网络请求这些操作，都是属于React中更新DOM的副作用，而操作这些副作用的函数，我们通常将其放入Effect Hook中。 案例​    需求：我们定义一个加法计数器，当点击按钮时，计数值加1，同时浏览器的title值会随着计数值的改变而改变。首先我们看不使用ho">
+<meta property="og:type" content="article">
+<meta property="og:title" content="useEffect &amp;&amp; useCallback &amp;&amp; useMemo">
+<meta property="og:url" content="http://example.com/2022/09/29/useEffect&&useCallback&&useMemo/index.html">
+<meta property="og:site_name" content="Soda的小破站">
+<meta property="og:description" content="useEffect作用​    在该Effect Hook中，我们可以完成类似于class组件中生命周期的功能。类似于更新DOM、发送网络请求这些操作，都是属于React中更新DOM的副作用，而操作这些副作用的函数，我们通常将其放入Effect Hook中。 案例​    需求：我们定义一个加法计数器，当点击按钮时，计数值加1，同时浏览器的title值会随着计数值的改变而改变。首先我们看不使用ho">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-29T08:31:32.465Z">
+<meta property="article:modified_time" content="2022-09-29T13:14:57.696Z">
+<meta property="article:author" content="Soda">
+<meta property="article:tag" content="React-Hooks">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/09/29/useEffect&&useCallback&&useMemo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>useEffect && useCallback && useMemo | Soda的小破站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Soda的小破站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/sodace" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/29/useEffect&&useCallback&&useMemo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Soda">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Soda的小破站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          useEffect && useCallback && useMemo
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-29 16:31:32 / 修改时间：21:14:57" itemprop="dateCreated datePublished" datetime="2022-09-29T16:31:32+08:00">2022-09-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/React/" itemprop="url" rel="index"><span itemprop="name">React</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="useEffect"><a href="#useEffect" class="headerlink" title="useEffect"></a>useEffect</h1><h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><p>​    在该Effect Hook中，我们可以完成类似于class组件中生命周期的功能。类似于更新DOM、发送网络请求这些操作，都是属于React中<strong>更新DOM的副作用</strong>，而操作这些副作用的函数，我们通常将其<strong>放入Effect Hook</strong>中。</p>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><p>​    需求：我们定义一个加法计数器，当点击按钮时，计数值加1，同时浏览器的title值会随着计数值的改变而改变。首先我们看不使用hook的版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; PureComponent &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line">export class App extends PureComponent &#123;</span><br><span class="line">  constructor() &#123;</span><br><span class="line">    super()</span><br><span class="line"></span><br><span class="line">    this.state = &#123;</span><br><span class="line">      counter: 100</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    document.title = this.state.counter</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidUpdate() &#123;</span><br><span class="line">    document.title = this.state.counter;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    const &#123; counter &#125; = this.state</span><br><span class="line"></span><br><span class="line">    return (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;h2&gt;计数: &#123;counter&#125;&lt;/h2&gt;</span><br><span class="line">        &lt;button onClick=&#123;e =&gt; this.setState(&#123; counter: counter+1 &#125;)&#125;&gt;+1&lt;/button&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default App</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>​    我们需要在componentDidMount以及componentDidUpdate两个生命周期中操作我们的DOM才能完成需求，这看起来显然比较复杂，如果我们在多个页面中都需要使用类似的需求，我们都要在其组件的两个生命周期中编写相同的逻辑，这显然让代码看起来十分不优雅。</p>
+<p>​    在class组件中实现该需求看起来略显复杂，而函数式组件中的代码实现相同的需求看起来比较简单合理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo &#125; from &quot;react&quot;;</span><br><span class="line">import &#123; useState &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">const changeTitle = memo((props) =&gt; &#123;</span><br><span class="line">	const [count, setCount] = useState(0);</span><br><span class="line"></span><br><span class="line">	document.title = count;</span><br><span class="line">	return (</span><br><span class="line">		&lt;div&gt;</span><br><span class="line">			&lt;h2&gt;&#123;count&#125;&lt;/h2&gt;</span><br><span class="line">			&lt;button onClick=&#123;(e) =&gt; setCount(count + 1)&#125;&gt;+1&lt;/button&gt;</span><br><span class="line">		&lt;/div&gt;</span><br><span class="line">	);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export default changeTitle;</span><br></pre></td></tr></table></figure>
+
+<p>​    在函数组件中，我们只需要一句话便可以完成上述需求，这看起来合理，但是该操作属于函数的副作用，在编写React代码中，我们应该尽量规避编类似的代码。</p>
+<p>​    结合上述两个案例，再来讲解Effect Hook会方便理解很多。</p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>​    我们可以通过Effect Hook来重构我们上述的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo &#125; from &#x27;react&#x27;</span><br><span class="line">import &#123; useState, useEffect &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(200)</span><br><span class="line"></span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    document.title = count</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h2&gt;当前计数: &#123;count&#125;&lt;/h2&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>​    useEffect的第一个参数要求我们传入一个函数，同时它也可以返回一个函数，而返回的函数，则是在该组件被销毁的时候执行，比如我们在useEffect中监听Redux数据的变化，则我们需要在组件销毁的时候取消监听。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo, useEffect &#125; from &#x27;react&#x27;</span><br><span class="line">import &#123; useState &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(0)</span><br><span class="line"></span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    console.log(&quot;监听redux中数据变化&quot;)</span><br><span class="line"></span><br><span class="line">    // 返回值: 回调函数 =&gt; 组件被重新渲染或者组件卸载的时候执行</span><br><span class="line">    return () =&gt; &#123;</span><br><span class="line">      console.log(&quot;取消监听redux中数据变化&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1(&#123;count&#125;)&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><p>​    比如我们在useEffect中发送网络请求，同时组件中有一个计数器，当我们点击按钮增加计数值的时候，由于render会重新执行，所以整个组件又重新被渲染，然后执行组件中的代码，这样网络请求会再次发送造成性能浪费。</p>
+<p>​    而useEffect第二个参数就是解决类似的问题，它接受的是一个数组，里面的参数代表第一个参数函数中所依赖的项，只有当依赖项发生改变的时候，该函数才会重新执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo, useEffect,useState &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(0)</span><br><span class="line"></span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    console.log(&quot;发送网络请求, 从服务器获取数据&quot;)</span><br><span class="line"></span><br><span class="line">    return () =&gt; &#123;</span><br><span class="line">      console.log(&quot;会在组件被卸载时, 才会执行一次&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [])</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1(&#123;count&#125;)&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br></pre></td></tr></table></figure>
+
+<p>​    我们在useEffect的第二个参数写上一个空数组，代表<strong>第一个函数不依赖任何项</strong>，则只会在组件被创建的时候<strong>执行一次</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo &#125; from &quot;react&quot;;</span><br><span class="line">import &#123; useEffect &#125; from &quot;react&quot;;</span><br><span class="line">import &#123; useState &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">const changeTitle = memo((props) =&gt; &#123;</span><br><span class="line">	const [count, setCount] = useState(0);</span><br><span class="line">	const [message, setMessage] = useState(&quot;Hello World&quot;);</span><br><span class="line"></span><br><span class="line">	useEffect(() =&gt; &#123;</span><br><span class="line">		document.title = count;</span><br><span class="line">	&#125;, [count]);</span><br><span class="line"></span><br><span class="line">	return (</span><br><span class="line">		&lt;div&gt;</span><br><span class="line">			&lt;h2&gt;&#123;count&#125;&lt;/h2&gt;</span><br><span class="line">			&lt;button onClick=&#123;(e) =&gt; setCount(count + 1)&#125;&gt;+1&lt;/button&gt;</span><br><span class="line">			&lt;button onClick=&#123;(e) =&gt; setMessage(&quot;Hello React&quot;)&#125;&gt;修改信息&lt;/button&gt;</span><br><span class="line">			&lt;h2&gt;&#123;message&#125;&lt;/h2&gt;</span><br><span class="line">		&lt;/div&gt;</span><br><span class="line">	);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export default changeTitle;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>​    在上面的例子中，我们在useEffect中第二个参数传入了count，只有count发生改变的时候，内部函数才会重新执行，所以当我们点击修改信息的按钮时，并不会执行useEffect中的函数。</p>
+<h1 id="useCallback"><a href="#useCallback" class="headerlink" title="useCallback"></a>useCallback</h1><h2 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h2><p>​    useCallBack会返回一个函数的记忆值，在依赖不变的时候，多次定义某个函数，返回的值是相同的。通常我们使用这个hook是为了防止子组件多次渲染。</p>
+<h2 id="案例-1"><a href="#案例-1" class="headerlink" title="案例"></a>案例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo, useState, useCallback &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const Home = memo(function(props) &#123;</span><br><span class="line">  const &#123; increment &#125; = props</span><br><span class="line">  console.log(&quot;Home被渲染&quot;)</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;button onClick=&#123;increment&#125;&gt;increment+1&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">const App = memo(function() &#123;</span><br><span class="line">  const [count, setCount] = useState(0)</span><br><span class="line">  const [message, setMessage] = useState(&quot;hello&quot;)</span><br><span class="line"></span><br><span class="line">  const increment = useCallback(function foo() &#123;</span><br><span class="line">    console.log(&quot;increment&quot;)</span><br><span class="line">    setCount(count+1)</span><br><span class="line">  &#125;, [count])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  // 普通的函数</span><br><span class="line">  // const increment = () =&gt; &#123;</span><br><span class="line">  //   setCount(count+1)</span><br><span class="line">  // &#125;</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h2&gt;计数: &#123;count&#125;&lt;/h2&gt;</span><br><span class="line">      &lt;button onClick=&#123;increment&#125;&gt;+1&lt;/button&gt;</span><br><span class="line"></span><br><span class="line">      &lt;Home increment=&#123;increment&#125;/&gt;</span><br><span class="line"></span><br><span class="line">      &lt;h2&gt;message:&#123;message&#125;&lt;/h2&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setMessage(Math.random())&#125;&gt;修改message&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export default App</span><br></pre></td></tr></table></figure>
+
+<p>​    当我们使用普通函数版本的increment，当我们修改message的时候，Home组件会被重新渲染，这时候因为修改message的时候，组件被重新渲染，increment被重新定义，而increment作为props传给home组件，<strong>当props中的属性发生改变时, 组件本身才会被重新渲染</strong>，所以home会重新被渲染，这显然十分浪费性能。</p>
+<p>​    但如果我们用useCallBack给increment进行包裹，并且第二个参数传入count，则只有count改变的时候，increment才会被重新定义，所以此时再修改message时，home组件不会被重新渲染。</p>
+<h1 id="useMemo"><a href="#useMemo" class="headerlink" title="useMemo"></a>useMemo</h1><h2 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h2><p>​    useMemo的作用和useCallback大同小异，其作用有两个，第一是为了缓存值，第二是防止子组件多次渲染。而useMemo传入的函数是需要返回的是一个函数。在官网中，也有一句话对两个的区别进行了阐述。</p>
+<blockquote>
+<p>useCallback(fn, deps)<code>相当于</code>useMemo(() &#x3D;&gt; fn, deps)</p>
+</blockquote>
+<h2 id="案例-2"><a href="#案例-2" class="headerlink" title="案例"></a>案例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo, useCallback &#125; from &#x27;react&#x27;</span><br><span class="line">import &#123; useMemo, useState &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const HelloWorld = memo(function(props) &#123;</span><br><span class="line">  console.log(&quot;HelloWorld被渲染~&quot;)</span><br><span class="line">  return &lt;h2&gt;Hello World&lt;/h2&gt;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">function calcNumTotal(num) &#123;</span><br><span class="line">  let total = 0</span><br><span class="line">  for (let i = 1; i &lt;= num; i++) &#123;</span><br><span class="line">    total += i</span><br><span class="line">  &#125;</span><br><span class="line">  return total</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(0)</span><br><span class="line"></span><br><span class="line">  const result = useMemo(() =&gt; &#123;</span><br><span class="line">    return calcNumTotal(50)</span><br><span class="line">  &#125;, [])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  const info = useMemo(() =&gt; (&#123;name: &quot;Soda&quot;, age: 21&#125;), [])</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h2&gt;计算结果: &#123;result&#125;&lt;/h2&gt;</span><br><span class="line">      &lt;h2&gt;计数器: &#123;count&#125;&lt;/h2&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1&lt;/button&gt;</span><br><span class="line"></span><br><span class="line">      &lt;HelloWorld  info=&#123;info&#125; /&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br></pre></td></tr></table></figure>
+
+<p>​    当我们将calNumTotal放入useMemo中，则我们修改计数器的值的时候，不会让result重新计算渲染，同时子组件HelloWorld也不会重新渲染（因为info对象被useMemo包裹，如果我们传入的只是普通的info对象，那么由于组件重新渲染导致info被重定义，父组件传入的props改变导致HelloWorld重新渲染）。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/React-Hooks/" rel="tag"># React-Hooks</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/06/URL%E5%92%8CURI%E7%9A%84%E5%8C%BA%E5%88%AB/" rel="prev" title="URL和URI的区别">
+      <i class="fa fa-chevron-left"></i> URL和URI的区别
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#useEffect"><span class="nav-number">1.</span> <span class="nav-text">useEffect</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B"><span class="nav-number">1.2.</span> <span class="nav-text">案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">1.4.</span> <span class="nav-text">性能优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#useCallback"><span class="nav-number">2.</span> <span class="nav-text">useCallback</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8-1"><span class="nav-number">2.1.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B-1"><span class="nav-number">2.2.</span> <span class="nav-text">案例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#useMemo"><span class="nav-number">3.</span> <span class="nav-text">useMemo</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8-2"><span class="nav-number">3.1.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B-2"><span class="nav-number">3.2.</span> <span class="nav-text">案例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Soda"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Soda</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/sodaace" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;sodaace" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1269551702@qq.com" title="E-Mail → mailto:1269551702@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Soda</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
