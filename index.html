@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-09-30 17:42:21" itemprop="dateModified" datetime="2022-09-30T17:42:21+08:00">2022-09-30</time>
+                <time title="修改时间：2022-09-30 19:53:21" itemprop="dateModified" datetime="2022-09-30T19:53:21+08:00">2022-09-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -220,7 +220,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo &#125; from &#x27;react&#x27;</span><br><span class="line">import &#123; useState, useEffect &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(200)</span><br><span class="line"></span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    document.title = count</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h2&gt;当前计数: &#123;count&#125;&lt;/h2&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>​ useEffect 的第一个参数要求我们传入一个函数，同时它也可以返回一个函数，而返回的函数，则是在该组件被销毁的时候执行，比如我们在 useEffect 中监听 Redux 数据的变化，则我们需要在组件销毁的时候取消监听。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo, useEffect &#125; from &#x27;react&#x27;</span><br><span class="line">import &#123; useState &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(0)</span><br><span class="line"></span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    console.log(&quot;监听redux中数据变化&quot;)</span><br><span class="line"></span><br><span class="line">    // 返回值: 回调函数 =&gt; 组件被重新渲染或者组件卸载的时候执行</span><br><span class="line">    return () =&gt; &#123;</span><br><span class="line">      console.log(&quot;取消监听redux中数据变化&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1(&#123;count&#125;)&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; memo, useEffect &#125; from &#x27;react&#x27;-000-------------</span><br><span class="line">import &#123; useState &#125; from &#x27;react&#x27;</span><br><span class="line"></span><br><span class="line">const App = memo(() =&gt; &#123;</span><br><span class="line">  const [count, setCount] = useState(0)</span><br><span class="line"></span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    console.log(&quot;监听redux中数据变化&quot;)</span><br><span class="line"></span><br><span class="line">    // 返回值: 回调函数 =&gt; 组件被重新渲染或者组件卸载的时候执行</span><br><span class="line">    return () =&gt; &#123;</span><br><span class="line">      console.log(&quot;取消监听redux中数据变化&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;button onClick=&#123;e =&gt; setCount(count+1)&#125;&gt;+1(&#123;count&#125;)&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default App</span><br></pre></td></tr></table></figure>
 
 <h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><p>​ 比如我们在 useEffect 中发送网络请求，同时组件中有一个计数器，当我们点击按钮增加计数值的时候，由于 render 会重新执行，所以整个组件又重新被渲染，然后执行组件中的代码，这样网络请求会再次发送造成性能浪费。</p>
 <p>​ 而 useEffect 第二个参数就是解决类似的问题，它接受的是一个数组，里面的参数代表第一个参数函数中所依赖的项，只有当依赖项发生改变的时候，该函数才会重新执行。</p>
@@ -284,10 +284,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-09-06 21:36:24 / 修改时间：22:07:36" itemprop="dateCreated datePublished" datetime="2022-09-06T21:36:24+08:00">2022-09-06</time>
+              <time title="创建时间：2022-09-06 21:36:24" itemprop="dateCreated datePublished" datetime="2022-09-06T21:36:24+08:00">2022-09-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-21 19:04:23" itemprop="dateModified" datetime="2022-11-21T19:04:23+08:00">2022-11-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -309,17 +315,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="初始URL"><a href="#初始URL" class="headerlink" title="初始URL"></a>初始URL</h1><p>​    URL全称为<strong>Uniform Resource Locator</strong>，代表着是<strong>统一资源定位符</strong>。用大白话来讲，URL正是使用Web浏览器等访问Web页面时需要输入的<strong>网页地址</strong>。</p>
-<h1 id="URI与URL的区别"><a href="#URI与URL的区别" class="headerlink" title="URI与URL的区别"></a>URI与URL的区别</h1><p>​    URI全称为<strong>Uniform Resource Identifier</strong>，代表着是<strong>统一资源标识符</strong>。</p>
-<p>​    URI用字符串<strong>标识某一互联网资源</strong>，而URL表示<strong>资源的地点</strong>（互联网上所处的位置）。可见<strong>URL是URI的子集</strong>。</p>
-<p>​    上面的概念看起来依旧晦涩难懂，我们拿人来做例子。假如世界上每个人的名字都不相同，那么名字就是URI其中的一个实例，我们可以通过每个人的名字来精确标识出唯一的人。</p>
-<p>​    但是现实中每个人的名字肯定是重复的，但是每个人的身份证号是肯定不同的，所以我们可以通过身份证号来精确标识出每一个人，这里身份证号就是URI的一个实例。</p>
-<p>​    那么URL在这个例子中可以如何体现呢？我们可以对比HTTP中URL的格式，就可以有：</p>
-<p>​    <code> 人类居住协议://地球/中国/湖北省/武汉市/某大学/某宿舍/xxx号寝室/张三</code></p>
-<p>​    我们可以通过这个<strong>特殊的URL</strong>，来精确的标识出某一个人。而这个URL，因为也起到了URI的作用，所以也是URI的一个实例。</p>
-<p>​    在这个例子中，我们既可以通过身份证号来精确标识出某一个人，也可以通过具体的居住信息来标识出某一个人，这些都是URI作用的体现，而URL的作用体现则是体现在后者的居住信息上。所以说URI是URL的一个子集。</p>
-<p>​    回到Web上，假如每个html文档都有自己唯一的编号，那么这个编号就是URI，则我们通过访问这个编号来访问具体的文档内容。而URL则是我们通过哪台主机哪个路径来去确定具体的资源，这种是通过路径定位的方式来确定具体的URI。</p>
-<p>​    用一句话总结来说，<strong>URL只能表示某一互联网资源（URI）的一个属性，即它的位置，而这个资源或许有其他的属性</strong>。</p>
+          <h1 id="初始-URL"><a href="#初始-URL" class="headerlink" title="初始 URL"></a>初始 URL</h1><p>​ URL 全称为<strong>Uniform Resource Locator</strong>，代表着是<strong>统一资源定位符</strong>。用大白话来讲，URL 正是使用 Web 浏览器等访问 Web 页面时需要输入的<strong>网页地址</strong>。</p>
+<h1 id="URI-与-URL-的区别"><a href="#URI-与-URL-的区别" class="headerlink" title="URI 与 URL 的区别"></a>URI 与 URL 的区别</h1><p>​ URI 全称为<strong>Uniform Resource Identifier</strong>，代表着是<strong>统一资源标识符</strong>。</p>
+<p>​ URI 用字符串<strong>标识某一互联网资源</strong>，而 URL 表示<strong>资源的地点</strong>（互联网上所处的位置）。可见<strong>URL 是 URI 的子集</strong>。</p>
+<p>​ 上面的概念看起来依旧晦涩难懂，我们拿人来做例子。假如世界上每个人的名字都不相同，那么名字就是 URI 其中的一个实例，我们可以通过每个人的名字来精确标识出唯一的人。</p>
+<p>​ 但是现实中每个人的名字肯定是重复的，但是每个人的身份证号是肯定不同的，所以我们可以通过身份证号来精确标识出每一个人，这里身份证号就是 URI 的一个实例。</p>
+<p>​ 那么 URL 在这个例子中可以如何体现呢？我们可以对比 HTTP 中 URL 的格式，就可以有：</p>
+<p>​ <code> 人类居住协议://地球/中国/湖北省/武汉市/某大学/某宿舍/xxx号寝室/张三</code></p>
+<p>​ 我们可以通过这个<strong>特殊的 URL</strong>，来精确的标识出某一个人。而这个 URL，因为也起到了 URI 的作用，所以也是 URI 的一个实例。</p>
+<p>​ 在这个例子中，我们既可以通过身份证号来精确标识出某一个人，也可以通过具体的居住信息来标识出某一个人，这些都是 URI 作用的体现，而 URL 的作用体现则是体现在后者的居住信息上。所以说 URI 是 URL 的一个子集。</p>
+<p>​ 回到 Web 上，假如每个 html 文档都有自己唯一的编号，那么这个编号就是 URI，则我们通过访问这个编号来访问具体的文档内容。而 URL 则是我们通过哪台主机哪个路径来去确定具体的资源，这种是通过路径定位的方式来确定具体的 URI。</p>
+<p>​ 用一句话来总结说，<strong>URL 只能表示某一互联网资源（URI）的一个属性，即它的位置，而这个资源或许有其他的属性</strong>。</p>
 
       
     </div>
